@@ -4,65 +4,65 @@
     "parameters": {
         "mspOfferName": {
             "type": "string",
+            "defaultValue": "DNX Solutions Managed Azure Services",
             "metadata": {
-                "description": "Specify a unique name for your offer"
+                "description": "The name of your Managed Service Offer."
             }
         },
         "mspOfferDescription": {
             "type": "string",
+            "defaultValue": "Delegated administration for proactive management, security, and optimization of Azure resources by DNX Solutions.",
             "metadata": {
-                "description": "Name of the Managed Service Provider offering"
+                "description": "A description of your offer and the services provided."
             }
         },
         "managedByTenantId": {
             "type": "string",
+            "defaultValue": "60c1e496-337d-46fb-b3e6-c697d4f142c7",
             "metadata": {
-                "description": "Specify the tenant id of the Managed Service Provider"
+                "description": "The Microsoft Entra tenant ID of your MSP."
             }
         },
         "authorizations": {
             "type": "array",
+            "defaultValue": [
+                {
+                    "principalId": "c05ef059-ed22-4c0b-bc58-8f35a24f5612",
+                    "principalIdDisplayName": "DNX Lighthouse Administrators",
+                    "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c"
+                },
+                {
+                    "principalId": "36142517-1fc6-4619-b180-8f101c50cbab",
+                    "principalIdDisplayName": "DNX Lighthouse Readers",
+                    "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+                },
+                {
+                    "principalId": "36142517-1fc6-4619-b180-8f101c50cbab",
+                    "principalIdDisplayName": "DNX Lighthouse Readers (Cost & Monitoring )",
+                    "roleDefinitionId": "43d0d8ad-25c7-4714-9337-8ba259a9fe05"
+                },
+                {
+                    "principalId": "0cdd5df6-f802-4953-9b2f-05691ff395ae",
+                    "principalIdDisplayName": "DNX Lighthouse Security Applications",
+                    "roleDefinitionId": "fb1c8493-542b-48eb-b624-b4c8fea62acd"
+                }
+            ],
             "metadata": {
-                "description": "Specify an array of objects, containing tuples of Azure Active Directory principalId, a Azure roleDefinitionId, and an optional principalIdDisplayName. The roleDefinition specified is granted to the principalId in the provider's Active Directory and the principalIdDisplayName is visible to customers."
+                "description": "An array of objects defining the permissions (roles) your groups will have on the customer's subscription."
             }
-        }              
-    },
-    "variables": {
-        "mspRegistrationName": "[guid(parameters('mspOfferName'))]",
-        "mspAssignmentName": "[guid(parameters('mspOfferName'))]"
+        }
     },
     "resources": [
         {
             "type": "Microsoft.ManagedServices/registrationDefinitions",
-            "apiVersion": "2019-09-01",
-            "name": "[variables('mspRegistrationName')]",
+            "apiVersion": "2022-10-01",
+            "name": "[guid(parameters('mspOfferName'))]",
             "properties": {
                 "registrationDefinitionName": "[parameters('mspOfferName')]",
                 "description": "[parameters('mspOfferDescription')]",
                 "managedByTenantId": "[parameters('managedByTenantId')]",
                 "authorizations": "[parameters('authorizations')]"
             }
-        },
-        {
-            "type": "Microsoft.ManagedServices/registrationAssignments",
-            "apiVersion": "2019-09-01",
-            "name": "[variables('mspAssignmentName')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.ManagedServices/registrationDefinitions/', variables('mspRegistrationName'))]"
-            ],
-            "properties": {
-                "registrationDefinitionId": "[resourceId('Microsoft.ManagedServices/registrationDefinitions/', variables('mspRegistrationName'))]"
-            }
         }
-    ],
-    "outputs": {
-        "mspOfferName": {
-            "type": "string",
-            "value": "[concat('Managed by', ' ', parameters('mspOfferName'))]"
-        },
-        "authorizations": {
-            "type": "array",
-            "value": "[parameters('authorizations')]"
-        }
-    }
+    ]
 }
